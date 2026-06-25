@@ -1,0 +1,8 @@
+services:
+  rubwallet:
+    image: ghcr.io/libnewton/mensa2gwallet
+    environment:
+      TZ: Europe/Berlin
+    volumes:
+      - ./tokens:/app/tokens
+    restart: unless-stopped
