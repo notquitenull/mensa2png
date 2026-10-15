@@ -1,23 +1,25 @@
 #!/usr/bin/env python
 import json
+import os
 from time import sleep
 
 import qrcode
 
 from akafoe import AkafoeClient, AkafoeError
 
-qr_code_filename = "MensaRabattCode.png"
-credentials_filename = "credentials.json"
+_current_folder = os.path.dirname(__file__)
+_qr_code_filename = _current_folder + "/MensaRabattCode.png"
+_credentials_filename = _current_folder + "/credentials.json"
 
 
 def login(akafoe: AkafoeClient):
     try:
-        with open(credentials_filename, "r") as credentials_file:
+        with open(_credentials_filename, "r") as credentials_file:
             credentials = json.load(credentials_file)
             akafoe.username = credentials["username"]
             akafoe.password = credentials["password"]
     except:
-        print(f"Failed to read {credentials_filename} and retrieve Akafö credentials!")
+        print(f"Failed to read {_credentials_filename} and retrieve Akafö credentials!")
         # hard exit on failiue (if anyone else want's to use this they should probably change this
         exit()
 
@@ -40,7 +42,7 @@ def store_qr_code(akafoe: AkafoeClient):
     qr_value = akafoe.get_qr_value()
 
     qr_code_image = qrcode.make(qr_value)
-    qr_code_image.save(qr_code_filename)
+    qr_code_image.save(_qr_code_filename)
 
 
 if __name__ == "__main__":
@@ -69,4 +71,4 @@ if __name__ == "__main__":
         import os
 
         # Remove outdated QR-Code in case of failiure
-        os.remove(qr_code_filename)
+        os.remove(_qr_code_filename)
