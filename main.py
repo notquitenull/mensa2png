@@ -11,21 +11,28 @@ credentials_filename = "credentials.json"
 
 
 def login(akafoe: AkafoeClient):
-    with open(credentials_filename, "r") as credentials_file:
-        credentials = json.load(credentials_file)
-        akafoe.username = credentials["username"]
-        akafoe.password = credentials["password"]
+    try:
+        with open(credentials_filename, "r") as credentials_file:
+            credentials = json.load(credentials_file)
+            akafoe.username = credentials["username"]
+            akafoe.password = credentials["password"]
+    except:
+        print(f"Failed to read {credentials_filename} and retrieve Akafö credentials!")
+        # hard exit on failiue (if anyone else want's to use this they should probably change this
+        exit()
+
+    """
+    Login
+    2 options: write an email client which waits for that speciffic email and inserts the code automatically,
+    and with that expose my RUB login to my RasPi, or at least write a notification service
+    which tells me when I need to manually run the login procedure again.
+
+    Third option: abuse the file syncing of syncthing to make me paste the 2fa code into a file in my sync folder,
+    which this script then grabs and uses to log in....
+    I will likely run into a timeout with this method as I suspect I won't notice the notification in time.
+    """
 
     # this can raise a AkafoeError
-    # And also requires me to enter the 2fa code sent vie email....
-    # 2 options: write an email client which waits for that speciffic email and inserts the code automatically,
-    # and with that expose my RUB login to my RasPi, or at least write a notification service
-    # which tells me when I need to manually run the login procedure again.
-
-    # Third option: abuse the file syncing of syncthing to make me paste the 2fa code into a file in my sync folder,
-    # which this script then grabs and uses to log in....
-    # I will likely run into a timeout with this method as I suspect I won't notice the notification in time.
-
     akafoe.login()
 
 
@@ -61,4 +68,5 @@ if __name__ == "__main__":
     if not success:
         import os
 
+        # Remove outdated QR-Code in case of failiure
         os.remove(qr_code_filename)
